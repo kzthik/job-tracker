@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karthik's Job Tracker</title>
+    <!-- Google Fonts for a modern and clean look -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+    /* Set the background image */
+    body {
+        font-family: 'Poppins', sans-serif; /* Updated font */
+        background: url('background.png') no-repeat center center fixed;
+        background-size: cover; /* Ensure the background covers the entire page */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    /* Container styling */
+    .container {
+        width: 80%;
+        max-width: 650px; /* Slightly smaller container */
+        background: rgba(50, 50, 50, 0.9); /* Darker form background */
+        padding: 20px; /* Reduced padding */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+        border-radius: 10px; /* Rounded corners */
+        box-sizing: border-box;
+    }
+
+    /* Title - Karthik's Job Tracker aligned to the left */
+    .title {
+        text-align: left;
+        font-size: 32px; /* Larger font for Karthik's Job Tracker */
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+
+    /* Section headings for Enter Details */
+    h2 {
+        font-size: 18px; /* Smaller font for section heading */
+        color: #fff;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    /* Form section inputs aligned to the left */
+    .form-section {
+        margin-bottom: 20px;
+    }
+
+    input[type="text"], input[type="date"], select {
+        width: 100%; /* Full-width input fields */
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-size: 14px;
+        display: block;
+        text-align: left;
+    }
+
+    select {
+        font-size: 14px;
+        color: #333; /* Default color for selected options */
+    }
+
+    select option[disabled] {
+        color: #999; /* Faint color for placeholder text */
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: inline-block;
+        text-align: center;
+        margin-top: 20px; /* Added margin for spacing */
+    }
+
+    button:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .container {
+            width: 95%;
+        }
+
+        button {
+            width: 100%; /* Full-width buttons for small screens */
+            margin-top: 10px;
+        }
+    }
+
+    /* Tracker styling */
+    .tracker {
+        margin-top: 20px;
+        color: #fff;
+        font-size: 16px;
+    }
+
+    .tracker span {
+        font-weight: 600;
+        margin-right: 20px;
+    }
+    
+    /* Success message */
+    #successMessage {
+        color: lightgreen;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title Section -->
+        <div class="title">Karthik's Job Tracker</div>
+        
+        <!-- Enter Details Section -->
+        <div class="form-section">
+            <h2>Enter Details</h2>
+            <input type="text" id="companyName" placeholder="Company Name">
+            <input type="text" id="designation" placeholder="Designation"> <!-- Added Designation Field -->
+            <input type="date" id="appliedDate" placeholder="Applied Date">
+
+            <select id="jobStatus">
+                <option value="" disabled selected hidden>Select Status</option> <!-- Placeholder -->
+                <option value="Applied">Applied</option>
+                <option value="Interview">Interview</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Offer">Offer</option>
+            </select>
+
+            <select id="jobType">
+                <option value="" disabled selected hidden>Select Type</option> <!-- Placeholder -->
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+            </select>
+
+            <select id="jobLocation">
+                <option value="" disabled selected hidden>Select Location</option> <!-- Placeholder -->
+                <option value="Remote">Remote</option>
+                <option value="On-site">On-site</option>
+                <option value="Hybrid">Hybrid</option>
+            </select>
+
+            <button onclick="addJob()">Add Job</button>
+        </div>
+
+        <!-- Tracker for counting statuses -->
+        <div class="tracker">
+            <span>Applied: <span id="appliedCount">0</span></span>
+            <span>Interview: <span id="interviewCount">0</span></span>
+            <span>Rejected: <span id="rejectedCount">0</span></span>
+            <span>Offer: <span id="offerCount">0</span></span>
+        </div>
+
+        <!-- Success message after adding a job -->
+        <div id="successMessage">Job added successfully!</div>
+
+        <!-- Export Button -->
+        <button onclick="exportToExcel()">Export to Excel</button>
+    </div>
+
+    <script>
+        let appliedCount = 0, interviewCount = 0, rejectedCount = 0, offerCount = 0;
+
+        function addJob() {
+            let companyName = document.getElementById("companyName").value;
+            let designation = document.getElementById("designation").value; // Capturing Designation
+            let appliedDate = document.getElementById("appliedDate").value;
+            let jobStatus = document.getElementById("jobStatus").value;
+            let jobType = document.getElementById("jobType").value;
+            let jobLocation = document.getElementById("jobLocation").value;
+
+            // Validate the fields (no empty inputs)
+            if (!companyName || !designation || !appliedDate) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Count jobs based on status
+            if (jobStatus === 'Applied') appliedCount++;
+            if (jobStatus === 'Interview') interviewCount++;
+            if (jobStatus === 'Rejected') rejectedCount++;
+            if (jobStatus === 'Offer') offerCount++;
+
+            updateTracker();
+
+            saveToLocalStorage();
+
+            // Reset form fields
+            document.getElementById("companyName").value = '';
+            document.getElementById("designation").value = '';
+            document.getElementById("appliedDate").value = '';
+            document.getElementById("jobStatus").value = '';  // Reset to placeholder
+            document.getElementById("jobType").value = '';    // Reset to placeholder
+            document.getElementById("jobLocation").value = ''; // Reset to placeholder
+
+            // Show success message
+            document.getElementById("successMessage").style.display = 'block';
+            setTimeout(function() {
+                document.getElementById("successMessage").style.display = 'none';
+            }, 2000); // Hide after 2 seconds
+        }
+
+        function updateTracker() {
+            document.getElementById("appliedCount").innerText = appliedCount;
+            document.getElementById("interviewCount").innerText = interviewCount;
+            document.getElementById("rejectedCount").innerText = rejectedCount;
+            document.getElementById("offerCount").innerText = offerCount;
+        }
+
+        function saveToLocalStorage() {
+            let counts = {
+                applied: appliedCount,
+                interview: interviewCount,
+                rejected: rejectedCount,
+                offer: offerCount
+            };
+            localStorage.setItem("jobCounts", JSON.stringify(counts));
+        }
+
+        function loadFromLocalStorage() {
+            let savedCounts = localStorage.getItem("jobCounts");
+            if (savedCounts) {
+                let counts = JSON.parse(savedCounts);
+                appliedCount = counts.applied;
+                interviewCount = counts.interview;
+                rejectedCount = counts.rejected;
+                offerCount = counts.offer;
+
+                // Update the tracker on page load
+                updateTracker();
+            }
+        }
+
+        window.onload = function() {
+            loadFromLocalStorage();
+        }
+
+        // Function to export the data to a CSV (Excel)
+        function exportToExcel() {
+            let data = [];
+            
+            // Add column headers first
+            let headers = ["Company Name", "Designation", "Applied Date", "Status", "Type", "Location"];
+            data.push(headers.join(",")); // Add the headers as the first row
+            
+            // Collect the data for each job entry
+            let listItems = document.querySelectorAll('#jobList li');
+            listItems.forEach((item) => {
+                data.push(item.innerText.replace(/ - /g, ",").replace(/, /g, ",")); // Replace ' - ' with commas for CSV format
+            });
+
+            let csvContent = "data:text/csv;charset=utf-8," + data.join("\n");
+
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "job_applications.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+    </script>
+</body>
+</html>
